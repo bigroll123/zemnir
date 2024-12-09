@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Prompt Interface</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .prompt-container {
+            width: 100%;
+            height: 200px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+        .terminal-output {
+            background-color: #000000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>ChatGPT Prompt Interface</h1>
+
+    <!-- Prompt Display -->
+    <div class="prompt-container" id="prompt-div">
+        <pre>{{ current_prompt }}</pre>
+    </div>
+
+    <!-- Form for Adding and Sending Prompt -->
+    <form method="POST" action="/add_and_send">
+      <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..."></textarea>
+      <input 
+          type="text" 
+          id="directory-path" 
+          name="directory_path" 
+          placeholder="Enter directory path for debugging (optional)" 
+          style="width: 100%; margin-top: 10px;" 
+      >
+      <div class="controls">
+          <input type="submit" value="Append and Send Prompt">
+      </div>
+  </form>
+    <!-- Auto Send Interval Controls -->
+    <h3>Auto Send Interval</h3>
+    <form>
+        <input type="radio" name="interval" value="10">10s
+        <input type="radio" name="interval" value="15">15s
+        <input type="radio" name="interval" value="30">30s
+        <input type="radio" name="interval" value="" checked>Off
+    </form>
+    <button onclick="applyInterval()">Apply Interval</button>
+
+    <!-- Terminal Output Section -->
+    <h3>Terminal Output</h3>
+    <div class="terminal-output">
+        {{ terminal_output }}
+    </div>
+
+    <script>
+        function applyInterval() {
+            const radios = document.getElementsByName('interval');
+            let selected = '';
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selected = radios[i].value;
+                    break;
+                }
+            }
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/auto_interval', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('interval=' + encodeURIComponent(selected));
+        }
+
+        // Text-to-Speech function
+        function speakText(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.rate = 1;
+            speech.pitch = 1;
+            speechSynthesis.speak(speech);
+        }
+
+        window.addEventListener('load', () => {
+            const assistantMessage = `{{ assistant_response | safe }}`;
+            if (assistantMessage) {
+                speakText(assistantMessage);
+            }
+        });
+
+        // Speech-to-Text (STT) Feature
+        let recognition;
+        try {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+        } catch (e) {
+            console.error('Speech Recognition not supported in this browser.');
+        }
+
+        const recordButton = document.getElementById('recordButton');
+        const transcription = document.getElementById('transcription');
+        const textarea = document.getElementById('prompt-textarea');
+
+        if (recordButton) {
+            recordButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (!recognition) return alert('Speech recognition not supported in this browser.');
+                recognition.start();
+                recordButton.innerText = '🎙️ Listening...';
+            });
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                transcription.textContent = `Transcribed: ${text}`;
+                textarea.value += ' ' + text;
+            };
+
+            recognition.onend = () => {
+                recordButton.innerText = '🎙️ Start Recording';
+            };
+        }
+    </script>
+</script>
+</body>
+</html>
