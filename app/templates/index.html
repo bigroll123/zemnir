@@ -14,6 +14,8 @@
             overflow: auto;
             border: 1px solid #ccc;
             padding: 10px;
+            resize: both;
+            box-sizing: border-box;
         }
         textarea {
             width: 100%;
@@ -41,7 +43,7 @@
 
     <!-- Prompt Display -->
     <div class="prompt-container" id="prompt-div">
-        <pre>{{ current_prompt }}</pre>
+        <pre id="numbered-lines">{{ current_prompt }}</pre>
     </div>
 
     <!-- Form for Adding and Sending Prompt -->
@@ -57,24 +59,32 @@
       <div class="controls">
           <input type="submit" value="Append and Send Prompt">
       </div>
-  </form>
-    <!-- Auto Send Interval Controls -->
-    <h3>Auto Send Interval</h3>
-    <form>
-        <input type="radio" name="interval" value="10">10s
-        <input type="radio" name="interval" value="15">15s
-        <input type="radio" name="interval" value="30">30s
-        <input type="radio" name="interval" value="" checked>Off
     </form>
-    <button onclick="applyInterval()">Apply Interval</button>
 
-    <!-- Terminal Output Section -->
+    <!-- Clear Prompt Button -->
+    <button id="clear-prompt">Clear Prompt</button>
+
     <h3>Terminal Output</h3>
     <div class="terminal-output">
         {{ terminal_output }}
     </div>
 
     <script>
+        // Scroll to the bottom of the prompt container
+        window.onload = function() {
+            var promptContainer = document.getElementById("prompt-div");
+            promptContainer.scrollTop = promptContainer.scrollHeight;
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event listener for clear prompt button
+            document.getElementById('clear-prompt').addEventListener('click', clearPrompt);
+
+            // Add the interval function
+            document.getElementsByName('interval').forEach(function (radio) {
+                radio.addEventListener('change', applyInterval);
+            });
+        });
+
         function applyInterval() {
             const radios = document.getElementsByName('interval');
             let selected = '';
@@ -90,57 +100,20 @@
             xhr.send('interval=' + encodeURIComponent(selected));
         }
 
-        // Text-to-Speech function
-        function speakText(text) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'en-US';
-            speech.rate = 1;
-            speech.pitch = 1;
-            speechSynthesis.speak(speech);
+        function clearPrompt() {
+            document.getElementById('prompt-textarea').value = '';  // Clear the textarea
+            document.getElementById('prompt-div').innerHTML = '';    // Clear the prompt display
+
+            // Clear the prompt.txt file by sending a request to the server
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/clear_prompt', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send();
         }
+        const pre = document.getElementById("numbered-lines");
+        const lines = pre.innerText.split("\n");
+        pre.innerHTML = lines.map((line, index) => `${index + 1}: ${line}`).join("<br>");
 
-        window.addEventListener('load', () => {
-            const assistantMessage = `{{ assistant_response | safe }}`;
-            if (assistantMessage) {
-                speakText(assistantMessage);
-            }
-        });
-
-        // Speech-to-Text (STT) Feature
-        let recognition;
-        try {
-            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-        } catch (e) {
-            console.error('Speech Recognition not supported in this browser.');
-        }
-
-        const recordButton = document.getElementById('recordButton');
-        const transcription = document.getElementById('transcription');
-        const textarea = document.getElementById('prompt-textarea');
-
-        if (recordButton) {
-            recordButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (!recognition) return alert('Speech recognition not supported in this browser.');
-                recognition.start();
-                recordButton.innerText = '🎙️ Listening...';
-            });
-
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                transcription.textContent = `Transcribed: ${text}`;
-                textarea.value += ' ' + text;
-            };
-
-            recognition.onend = () => {
-                recordButton.innerText = '🎙️ Start Recording';
-            };
-        }
     </script>
-</script>
 </body>
 </html>

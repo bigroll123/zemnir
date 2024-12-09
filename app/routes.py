@@ -4,6 +4,8 @@ from services.file_manager import read_prompt, append_to_prompt, read_terminal_o
 from services.chatgpt_service import send_directory_to_api
 import os
 from services.directory_processor import get_directory_structure_and_content
+from config import Config
+PROMPT_FILE = Config.PROMPT_FILE
 
 app_routes = Blueprint("app_routes", __name__)
 
@@ -42,7 +44,6 @@ def add_and_send():
     send_to_api()
     return redirect("/")
 
-
 @app_routes.route("/debug_directory", methods=["POST"])
 def debug_directory():
     directory_path = request.json.get("directory_path")
@@ -56,4 +57,9 @@ def debug_directory():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+@app_routes.route("/clear_prompt", methods=["POST"])
+def clear_prompt():
+    # Truncate the prompt.txt file
+    with open(PROMPT_FILE, "w") as f:
+        f.write('')
+    return jsonify({"message": "Prompt cleared successfully."}), 200
