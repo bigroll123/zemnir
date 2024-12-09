@@ -21,16 +21,18 @@ def index():
 
 @app_routes.route("/add_and_send", methods=["POST"])
 def add_and_send():
-    # Get the prompt text
     new_text = request.form.get("new_text", "").strip()
-    # Get the directory path
     directory_path = request.form.get("directory_path", "").strip()
+    send_terminal_output = request.form.get("send_terminal_output") == "yes"  # Check if the checkbox is checked
 
-    # Append the user input to the prompt
     if new_text:
         append_to_prompt(f"User: {new_text}")
+    else:
+        if send_terminal_output:
+            terminal_output = read_terminal_output()  # Get the terminal output
+            append_to_prompt(f"Terminal Output: {terminal_output}")  # Append it to the prompt    
+      
 
-    # If a directory is provided, process it and append its structure and content
     if directory_path:
         if not os.path.exists(directory_path) or not os.path.isdir(directory_path):
             append_to_prompt(f"Error: Invalid directory path: {directory_path}")
@@ -41,6 +43,9 @@ def add_and_send():
             append_to_prompt(f"Contents: {directory_info['files']}")
 
     # Send the prompt to the API
+    #if send_terminal_output:
+    #    terminal_output = read_terminal_output()  # Get the terminal output
+    #    append_to_prompt(f"Terminal Output: {terminal_output}")  # Append it to the prompt
     send_to_api()
     return redirect("/")
 
@@ -50,7 +55,6 @@ def debug_directory():
     if not os.path.exists(directory_path) or not os.path.isdir(directory_path):
         return jsonify({"error": "Invalid directory path"}), 400
 
-    # Send directory data to API
     try:
         response = send_directory_to_api(directory_path)
         return jsonify({"response": response})
@@ -59,7 +63,6 @@ def debug_directory():
 
 @app_routes.route("/clear_prompt", methods=["POST"])
 def clear_prompt():
-    # Truncate the prompt.txt file
     with open(PROMPT_FILE, "w") as f:
         f.write('')
     return jsonify({"message": "Prompt cleared successfully."}), 200

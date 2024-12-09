@@ -136,6 +136,7 @@
             border: 2px solid #00ff00;
             box-shadow: 0 0 10px #00ff00;
             margin-top: 20px;
+            resize: both;
         }
 
         /* Footer */
@@ -156,7 +157,7 @@
 
     <!-- Prompt Display -->
     <div class="prompt-container" id="prompt-div">
-        <pre id="numbered-lines">{{ current_prompt }}</pre>
+        <pre>{{ current_prompt }}</pre>
     </div>
 
     <!-- Form for Adding and Sending Prompt -->
@@ -171,6 +172,9 @@
           placeholder="Enter directory path for debugging (optional)" 
           style="width: 30%; margin-top: 10px;" 
       >
+      <label>
+        <input type="checkbox" name="send_terminal_output" value="yes"> Send terminal output to ChatGPT API
+      </label>
       <div class="controls">
           <input type="submit" value="Append and Send Prompt">
       </div>
@@ -225,9 +229,9 @@
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.send();
         }
-        const pre = document.getElementById("numbered-lines");
-        const lines = pre.innerText.split("\n");
-        pre.innerHTML = lines.map((line, index) => `${index + 1}: ${line}`).join("<br>");
+     //   const pre = document.getElementById("numbered-lines");
+     //   const lines = pre.innerText.split("\n");
+     //   pre.innerHTML = lines.map((line, index) => `${index + 1}: ${line}`).join("<br>");
 
     </script>
 </body>
