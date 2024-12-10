@@ -1,6 +1,8 @@
 from app import create_app
 import os
+import sys
 
+sys.pycache_prefix = '/tmp/zemnir_pycache'
 
 app = create_app()
 
@@ -15,3 +17,4 @@ if __name__ == "__main__":
 
     # Run the app
     app.run(host="0.0.0.0", port=8443, ssl_context=ssl_context, debug=True)
+
