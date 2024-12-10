@@ -5,3 +5,5 @@ class Config:
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "your_openai_api_key")
     PROMPT_FILE = "../prompt.txt"
     TERMINAL_OUTPUT_FILE = "../terminal_output.txt"
+    CERT_FILE="../cert.pem"
+    KEY_FILE="../key.pem"

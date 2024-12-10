@@ -1,16 +1,21 @@
-from app import create_app
 import os
 import sys
+sys.pycache_prefix = "/tmp/zemnir_pycache"
+from config import Config
 
-sys.pycache_prefix = '/tmp/zemnir_pycache'
+CERT_FILE = Config.CERT_FILE
+KEY_FILE = Config.KEY_FILE
+
+
+from app import create_app
 
 app = create_app()
 
 if __name__ == "__main__":
     # Check for SSL certificate files
     ssl_context = None
-    cert_file = "../cert.pem"
-    key_file = "../key.pem"
+    cert_file = CERT_FILE
+    key_file = KEY_FILE
 
     if os.path.exists(cert_file) and os.path.exists(key_file):
         ssl_context = (cert_file, key_file)
