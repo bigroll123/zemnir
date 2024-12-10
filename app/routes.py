@@ -23,6 +23,7 @@ def index():
 def add_and_send():
     new_text = request.form.get("new_text", "").strip()
     directory_path = request.form.get("directory_path", "").strip()
+    model = request.form.get("model")  # Get the selected model
     send_terminal_output = request.form.get("send_terminal_output") == "yes"  # Check if the checkbox is checked
 
     if new_text:
@@ -31,7 +32,6 @@ def add_and_send():
         if send_terminal_output:
             terminal_output = read_terminal_output()  # Get the terminal output
             append_to_prompt(f"Terminal Output: {terminal_output}")  # Append it to the prompt    
-      
 
     if directory_path:
         if not os.path.exists(directory_path) or not os.path.isdir(directory_path):
@@ -42,11 +42,8 @@ def add_and_send():
             append_to_prompt(f"Structure: {directory_info['structure']}")
             append_to_prompt(f"Contents: {directory_info['files']}")
 
-    # Send the prompt to the API
-    #if send_terminal_output:
-    #    terminal_output = read_terminal_output()  # Get the terminal output
-    #    append_to_prompt(f"Terminal Output: {terminal_output}")  # Append it to the prompt
-    send_to_api()
+    # Send the prompt to the API with the selected model
+    send_to_api(model)
     return redirect("/")
 
 @app_routes.route("/debug_directory", methods=["POST"])
@@ -56,7 +53,7 @@ def debug_directory():
         return jsonify({"error": "Invalid directory path"}), 400
 
     try:
-        response = send_directory_to_api(directory_path)
+        response = send_directory_to_api(directory_path, model)  # Pass the model
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

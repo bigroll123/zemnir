@@ -34,6 +34,19 @@
       <label>
         <input type="checkbox" name="send_terminal_output" value="yes"> Send terminal output to ChatGPT API
       </label>
+
+      <!-- Dropdown for model selection -->
+      <label for="model-select">Select Model:</label>
+      <select id="model-select" name="model">
+          <option value="gpt-4o-mini">gpt-4o-mini</option>
+          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+          <option value="gpt-4">gpt-4</option>
+          <option value="gpt-4o">gpt-4o</option>
+          <option value="gpt-4-turbo">gpt-4-turbo</option>
+          <option value="o1-mini">o1-mini</option>
+          <option value="tts-1">tts-1</option>
+      </select>
+
       <div class="controls">
           <input type="submit" value="Append and Send Prompt">
       </div>
@@ -56,27 +69,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Event listener for clear prompt button
             document.getElementById('clear-prompt').addEventListener('click', clearPrompt);
-
-            // Add the interval function
-            document.getElementsByName('interval').forEach(function (radio) {
-                radio.addEventListener('change', applyInterval);
-            });
         });
-
-        function applyInterval() {
-            const radios = document.getElementsByName('interval');
-            let selected = '';
-            for (let i = 0; i < radios.length; i++) {
-                if (radios[i].checked) {
-                    selected = radios[i].value;
-                    break;
-                }
-            }
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/auto_interval', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.send('interval=' + encodeURIComponent(selected));
-        }
 
         function clearPrompt() {
             document.getElementById('prompt-textarea').value = '';  // Clear the textarea

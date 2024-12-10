@@ -40,9 +40,10 @@ The application maintains a simple and logical file structure, as shown below.
 │   ├── __init__.py
 │   ├── main.py
 │   ├── routes.py
+│   ├── static
+│   │   └── styles.css
 │   └── templates
-│       ├── index.html
-│       └── static
+│       └── index.html
 ├── config.py
 ├── README.md
 ├── requirements.txt
@@ -51,6 +52,7 @@ The application maintains a simple and logical file structure, as shown below.
 │   ├── chatgpt_service.py
 │   ├── directory_processor.py
 │   ├── file_manager.py
+│   ├── __init__.py
 │   └── terminal_runner.py
 └── tests
     └── test_routes.py
