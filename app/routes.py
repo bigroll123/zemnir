@@ -11,10 +11,12 @@ app_routes = Blueprint("app_routes", __name__)
 
 @app_routes.route("/", methods=["GET"])
 def index():
+    model = request.form.get("model", "gpt-4o-mini") 
     current_prompt = read_prompt()
     terminal_output = read_terminal_output()
     return render_template(
         "index.html",
+        model=model,
         current_prompt=current_prompt,
         terminal_output=terminal_output,
     )
