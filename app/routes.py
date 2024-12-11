@@ -1,19 +1,20 @@
-from flask import Blueprint, render_template, request, redirect, jsonify
+from flask import Blueprint, render_template, request, redirect, jsonify, session
 from services.chatgpt_service import send_to_api
 from services.file_manager import read_prompt, append_to_prompt, read_terminal_output
 from services.chatgpt_service import send_directory_to_api
 import os
 from services.directory_processor import get_directory_structure_and_content
 from config import Config
+
 PROMPT_FILE = Config.PROMPT_FILE
 
 app_routes = Blueprint("app_routes", __name__)
 
 @app_routes.route("/", methods=["GET"])
 def index():
-    model = request.form.get("model", "gpt-4o-mini") 
+    model = session.get('model', 'gpt-4o-mini')
     current_prompt = read_prompt()
-    terminal_output = read_terminal_output()
+    terminal_output = read_terminal_output()  # Read terminal output for display
     return render_template(
         "index.html",
         model=model,
@@ -25,11 +26,15 @@ def index():
 def add_and_send():
     new_text = request.form.get("new_text", "").strip()
     directory_path = request.form.get("directory_path", "").strip()
-    model = request.form.get("model")  # Get the selected model
+    model = request.form.get("model", "gpt-4o-mini")
+    session['model'] = model  # Save model in session
     send_terminal_output = request.form.get("send_terminal_output") == "yes"  # Check if the checkbox is checked
 
     if new_text:
         append_to_prompt(f"User: {new_text}")
+        if send_terminal_output:
+            terminal_output = read_terminal_output()  # Get the terminal output
+            append_to_prompt(f"Terminal Output: {terminal_output}")  # Append it to the prompt         
     else:
         if send_terminal_output:
             terminal_output = read_terminal_output()  # Get the terminal output

@@ -22,39 +22,43 @@
     <!-- Form for Adding and Sending Prompt -->
     <form method="POST" action="/add_and_send" class="form-container">
       <div class="textarea-container">
-          <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..."></textarea>
+          <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..." class="form-control"></textarea>
       </div>
       <input 
           type="text" 
           id="directory-path" 
           name="directory_path" 
           placeholder="Enter directory path for debugging (optional)" 
+          class="form-control" 
           style="width: 30%; margin-top: 10px;" 
       >
       <label>
         <input type="checkbox" name="send_terminal_output" value="yes"> Send terminal output to ChatGPT API
       </label>
 
-      <!-- Dropdown for model selection -->
-      <label for="model-select">Select Model:</label>
-      <select id="model-select" name="model">
-          <option value="gpt-4o-mini">gpt-4o-mini</option>
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-          <option value="gpt-4">gpt-4</option>
-          <option value="gpt-4o">gpt-4o</option>
-          <option value="gpt-4-turbo">gpt-4-turbo</option>
-          <option value="o1-mini">o1-mini</option>
-          <option value="tts-1">tts-1</option>
-      </select>
-
       <div class="controls">
+      <!-- Bootstrap Dropdown for model selection -->
+      <div class="dropdown">
+        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ model if model else 'Select Model' }}  <!-- Display selected model or default text -->
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4o-mini')">gpt-4o-mini</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('gpt-3.5-turbo')">gpt-3.5-turbo</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4')">gpt-4</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4o')">gpt-4o</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4-turbo')">gpt-4-turbo</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('o1-mini')">o1-mini</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setModel('tts-1')">tts-1</a></li>
+        </ul>
+    </div>
+    <input type="hidden" id="model" name="model" value="{{ model }}">
           <button type="submit" class="btn btn-success">
             <i class="bi bi-send"></i> Append and Send Prompt
           </button>
-          <button type="submit" class="btn btn-danger" id="clear-prompt">Clear Prompt</button>
+          <button type="button" class="btn btn-danger" id="clear-prompt">Clear Prompt</button>
         </div>
     </form>
-
 
     <h3>Terminal Output</h3>
     <div class="terminal-output">
@@ -62,6 +66,12 @@
     </div>
 
     <script>
+        function setModel(selectedModel) {
+            document.getElementById('model').value = selectedModel; // Set the hidden input value
+            var dropdownButton = document.getElementById('dropdownMenuButton');
+            dropdownButton.innerHTML = selectedModel; // Change button text
+        }
+
         // Scroll to the bottom of the prompt container
         window.onload = function() {
             var promptContainer = document.getElementById("prompt-div");
@@ -83,5 +93,7 @@
             xhr.send();
         }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
