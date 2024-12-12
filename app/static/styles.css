@@ -1,8 +1,9 @@
     /* General Layout */
 body {
     font-family: 'Open Sans', sans-serif;
-    padding: 20px;
-    background-color: #f4f4f9;
+    padding: 20px;  
+    background-color: #fff;
+    background-image: linear-gradient(to bottom , #fff , #fff ));
     color: #333;
 }
 

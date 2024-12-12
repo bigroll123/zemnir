@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="static/favicon.ico" type="image/x-icon">
+<!--    <img src="static/logo.png" alt="Company Logo" width="100" height="100"> -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zemnir GPT assistant</title>
@@ -10,6 +12,7 @@
     <script src="{{ url_for('static', filename='js/refresh.js') }}"></script>
 </head>
 <body>
+    
     <h1>Zemnir Prompt</h1>
     <div class="prompt-container" id="prompt-div">
         <pre>{{ current_prompt }}</pre>

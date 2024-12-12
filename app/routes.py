@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, jsonify, session
 from services.chatgpt_service import send_to_api
 from services.file_manager import read_prompt, append_to_prompt, read_terminal_output
-from services.chatgpt_service import send_directory_to_api
 import os
 from services.directory_processor import get_directory_structure_and_content
 from config import Config
@@ -52,18 +51,6 @@ def add_and_send():
     # Send the prompt to the API with the selected model
     send_to_api(model)
     return redirect("/")
-
-@app_routes.route("/debug_directory", methods=["POST"])
-def debug_directory():
-    directory_path = request.json.get("directory_path")
-    if not os.path.exists(directory_path) or not os.path.isdir(directory_path):
-        return jsonify({"error": "Invalid directory path"}), 400
-
-    try:
-        response = send_directory_to_api(directory_path, model)  # Pass the model
-        return jsonify({"response": response})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @app_routes.route("/clear_prompt", methods=["POST"])
 def clear_prompt():
