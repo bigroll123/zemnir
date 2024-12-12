@@ -1,17 +1,19 @@
 import openai
-from services.file_manager import read_prompt, append_to_prompt, write_terminal_output
+from services.file_manager import read_prompt, append_to_prompt, write_terminal_output, truncate_prompt_file
 from services.terminal_runner import extract_and_run_terminal_commands
 from services.directory_processor import get_directory_structure_and_content
 
 # openai.api_key = "YOUR_API_KEY"  # Replace or use an environment variable
 
 
-def send_to_api(model):
+def send_to_api(model, max_lines=3000):
     print(f"Using model: {model}")  # Print the current model
+    truncate_prompt_file(max_lines)
 
     # Step 1: Read the current prompt
 
     prompt = read_prompt()
+    prompt = "\n".join(" ".join(line.replace("\t", " ").split()) for line in prompt.splitlines() if line.strip())    
 
     # Step 2: Send the prompt to OpenAI's API
 
