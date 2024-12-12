@@ -61,7 +61,6 @@ The application maintains a simple and logical file structure, as shown below.
 
 ### **Directory Explanations**
 - **`changes/`**: This is where ChatGPT stores file updates. If ChatGPT suggests an improvement or code change, the new version is stored here. Subdirectory structures are preserved, so you can see exactly where files are updated.
-- **`uploads/`**: User-uploaded files and folders are stored here. These files can be sent to ChatGPT for debugging, analysis, or file-based improvements.
 - **`templates/`**: Contains the **HTML templates** used for the interface, like `index.html`.
 - **`static/`**: Stores **CSS, JavaScript, and images** for the web interface.
   
