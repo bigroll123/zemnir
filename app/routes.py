@@ -12,13 +12,18 @@ app_routes = Blueprint("app_routes", __name__)
 @app_routes.route("/", methods=["GET"])
 def index():
     model = session.get('model', 'gpt-4o-mini')
+    system_role = session.get("system_role", "Linux system administrator")
     current_prompt = read_prompt()
+    refresh_interval = session.get("refresh_interval", "disabled")  # Set default to "disabled"
     terminal_output = read_terminal_output()  # Read terminal output for display
     return render_template(
         "index.html",
         model=model,
+        system_role=system_role,
         current_prompt=current_prompt,
         terminal_output=terminal_output,
+        refresh_interval=refresh_interval,
+
     )
 
 @app_routes.route("/add_and_send", methods=["POST"])
@@ -27,6 +32,8 @@ def add_and_send():
     directory_path = request.form.get("directory_path", "").strip()
     model = request.form.get("model", "gpt-4o-mini")
     session['model'] = model  # Save model in session
+    system_role = request.form.get("system_role", "Linux system administrator")
+    session['system_role'] = system_role  # Save role in session
     send_terminal_output = request.form.get("send_terminal_output") == "yes"  # Check if the checkbox is checked
 
     if new_text:
@@ -49,7 +56,7 @@ def add_and_send():
             append_to_prompt(f"Contents: {directory_info['files']}")
 
     # Send the prompt to the API with the selected model
-    send_to_api(model)
+    send_to_api(model,system_role)
     return redirect("/")
 
 @app_routes.route("/clear_prompt", methods=["POST"])

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="icon" href="static/favicon.ico" type="image/x-icon">
-<!--    <img src="static/logo.png" alt="Company Logo" width="100" height="100"> -->
+    <!--    <img src="static/logo.png" alt="Company Logo" width="100" height="100"> -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zemnir GPT assistant</title>
@@ -11,8 +12,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='js/refresh.js') }}"></script>
 </head>
+
 <body>
-    
+
     <h1>Zemnir Prompt</h1>
     <div class="prompt-container" id="prompt-div">
         <pre>{{ current_prompt }}</pre>
@@ -20,23 +22,21 @@
 
     <form method="POST" action="/add_and_send" class="form-container">
         <div class="textarea-container">
-            <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..." class="form-control"></textarea>
+            <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..."
+                class="form-control"></textarea>
         </div>
-        <input 
-        type="text" 
-        id="directory-path" 
-        name="directory_path" 
-        placeholder="Enter directory path for debugging (optional)" 
-        class="form-control" 
-        style="width: 30%; margin-top: 10px;" 
-    >
+        <input type="text" id="directory-path" name="directory_path"
+            placeholder="Enter directory path for debugging (optional)" class="form-control"
+            style="width: 30%; margin-top: 10px;">
         <label>
-            <input type="checkbox" id="send-terminal-output" name="send_terminal_output" value="yes"> Send terminal output to ChatGPT API
+            <input type="checkbox" id="send-terminal-output" name="send_terminal_output" value="yes"> Send terminal
+            output to ChatGPT API
         </label>
 
         <div class="controls">
             <div class="dropdown">
-                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
                     {{ model if model else 'Select Model' }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -55,15 +55,37 @@
             </button>
             <button type="button" class="btn btn-danger" id="clear-prompt">Clear Prompt</button>
             <div class="dropdown">
-                <button class="btn btn-info dropdown-toggle" type="button" id="refreshDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">Select Refresh Interval</button>
+                <button class="btn btn-warning dropdown-toggle" type="button" id="refreshDropdownButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ refresh_interval if refresh_interval else 'Select Interval' }}
+                </button>
                 <ul class="dropdown-menu" aria-labelledby="refreshDropdownButton">
                     <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('15s')">15 seconds</a></li>
                     <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('1m')">1 minute</a></li>
                     <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('5m')">5 minutes</a></li>
                     <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('15m')">15 minutes</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('disabled')">Disabled Auto Refresh</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setRefreshIntervalValue('disabled')">Disabled Auto
+                            Refresh</a></li>
                 </ul>
                 <input type="hidden" id="refresh-interval" name="refresh_interval" value="disabled">
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="systemRoleDropdownButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ system_role if system_role else 'Select Role' }}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="systemRoleDropdownButton">
+                    <li><a class="dropdown-item" href="#"
+                            onclick="setSystemRole('System Administrator')">System Administrator</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('DevOps Engineer')">DevOps Engineer</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Software Developer')">Software Developer</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Support Analyst')">Support Analyst</a>
+                    </li>
+                </ul>
+                <input type="hidden" id="system-role" name="system_role" value="{{ system_role }}">
             </div>
         </div>
     </form>
@@ -75,25 +97,49 @@
             document.getElementById('model').value = selectedModel; // Set the hidden input value
             var dropdownButton = document.getElementById('dropdownMenuButton');
             dropdownButton.innerHTML = selectedModel; // Change button text
+            localStorage.setItem('model', selectedModel); // Save to local storage
+        }
+        function setRefreshIntervalValue(selectedInterval) {
+            document.getElementById('refresh-interval').value = selectedInterval; // Set the hidden input value
+            var dropdownButton = document.getElementById('refreshDropdownButton');
+            dropdownButton.innerHTML = selectedInterval === "disabled" ? "Disabled Auto Refresh" : document.querySelector('a[onclick="setRefreshIntervalValue(\'' + selectedInterval + '\')"]').text;
+            localStorage.setItem('refreshInterval', selectedInterval); // Save to local storage
+            clearInterval(refreshIntervalId);
+            if (selectedInterval !== "disabled") {
+                refreshIntervalId = setInterval(triggerAppendAndSend, refreshIntervals[selectedInterval]);
+            }
+        }
+        function setSystemRole(selectedRole) {
+            document.getElementById('system-role').value = selectedRole; // Set the hidden input value
+            var dropdownButton = document.getElementById('systemRoleDropdownButton');
+            dropdownButton.innerHTML = selectedRole; // Change button text
+            localStorage.setItem('systemRole', selectedRole); // Save to local storage
         }
 
         // Scroll to the bottom of the prompt container
-        window.onload = function() {
+        window.onload = function () {
             var promptContainer = document.getElementById("prompt-div");
             promptContainer.scrollTop = promptContainer.scrollHeight;
+            var currentModel = localStorage.getItem('model') || document.getElementById('model').value;
+            setModel(currentModel);
+            var savedRole = localStorage.getItem('systemRole') || document.getElementById('system-role').value;
+            setSystemRole(savedRole);
+            var savedIntervalKey = localStorage.getItem('refreshInterval') || document.getElementById('refresh-interval').value;
+            setRefreshIntervalValue(savedIntervalKey);
+
         };
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Event listener for clear prompt button
             document.getElementById('clear-prompt').addEventListener('click', clearPrompt);
             const sendTerminalOutputCheckbox = document.getElementById('send-terminal-output');
             const savedCheckboxState = localStorage.getItem('sendTerminalOutput');
             sendTerminalOutputCheckbox.checked = savedCheckboxState === 'true';
 
-            sendTerminalOutputCheckbox.addEventListener('change', function() {
+            sendTerminalOutputCheckbox.addEventListener('change', function () {
                 localStorage.setItem('sendTerminalOutput', this.checked);
             });
-        });
 
+        });
         function clearPrompt() {
             document.getElementById('prompt-textarea').value = '';  // Clear the textarea
             document.getElementById('prompt-div').innerHTML = '';    // Clear the prompt display
@@ -104,16 +150,12 @@
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.send();
         }
-        function toggleRefresh() {
-            const isDisabled = document.getElementById('disable-refresh').checked;
 
-            // Disable the radio buttons if the checkbox is checked
-            document.querySelectorAll('input[name="refresh-interval"]').forEach(elem => {
-                elem.disabled = isDisabled;
-            });
-        }
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>
