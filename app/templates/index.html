@@ -15,7 +15,7 @@
 
 <body>
 
-    <h1>Zemnir Prompt</h1>
+   <!--  <h1>Zemnir Prompt</h1> -->
     <div class="prompt-container" id="prompt-div">
         <pre>{{ current_prompt }}</pre>
     </div>
@@ -32,7 +32,6 @@
             <input type="checkbox" id="send-terminal-output" name="send_terminal_output" value="yes"> Send terminal
             output to ChatGPT API
         </label>
-
         <div class="controls">
             <div class="dropdown">
                 <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -75,21 +74,18 @@
                     {{ system_role if system_role else 'Select Role' }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="systemRoleDropdownButton">
-                    <li><a class="dropdown-item" href="#"
-                            onclick="setSystemRole('System Administrator')">System Administrator</a>
-                    </li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('DevOps Engineer')">DevOps Engineer</a>
-                    </li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Software Developer')">Software Developer</a>
-                    </li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Support Analyst')">Support Analyst</a>
-                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Expert No Execution')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Expert No Execution'] }}">Expert No Execution</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('System Administrator')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['System Administrator'] }}">System Administrator</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('DevOps Engineer')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['DevOps Engineer'] }}">DevOps Engineer</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Software Developer')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Software Developer'] }}">Software Developer</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Support Analyst')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Support Analyst'] }}">Support Analyst</a></li>
                 </ul>
                 <input type="hidden" id="system-role" name="system_role" value="{{ system_role }}">
             </div>
         </div>
     </form>
-    <h3>Terminal Output</h3>
+   <!-- <h3>Terminal Output</h3> -->
+
     <div class="terminal-output">{{ terminal_output }}</div>
 
     <script>
@@ -134,11 +130,14 @@
             const sendTerminalOutputCheckbox = document.getElementById('send-terminal-output');
             const savedCheckboxState = localStorage.getItem('sendTerminalOutput');
             sendTerminalOutputCheckbox.checked = savedCheckboxState === 'true';
-
             sendTerminalOutputCheckbox.addEventListener('change', function () {
                 localStorage.setItem('sendTerminalOutput', this.checked);
             });
-
+            
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
         function clearPrompt() {
             document.getElementById('prompt-textarea').value = '';  // Clear the textarea

@@ -3,10 +3,9 @@ from services.chatgpt_service import send_to_api
 from services.file_manager import read_prompt, append_to_prompt, read_terminal_output
 import os
 from services.directory_processor import get_directory_structure_and_content
-from config import Config
+from config import Config, system_role_definitions
 
 PROMPT_FILE = Config.PROMPT_FILE
-
 app_routes = Blueprint("app_routes", __name__)
 
 @app_routes.route("/", methods=["GET"])
@@ -23,6 +22,7 @@ def index():
         current_prompt=current_prompt,
         terminal_output=terminal_output,
         refresh_interval=refresh_interval,
+        role_definitions=system_role_definitions,
 
     )
 
@@ -56,7 +56,7 @@ def add_and_send():
             append_to_prompt(f"Contents: {directory_info['files']}")
 
     # Send the prompt to the API with the selected model
-    send_to_api(model,system_role)
+    send_to_api(model, system_role)
     return redirect("/")
 
 @app_routes.route("/clear_prompt", methods=["POST"])
