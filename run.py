@@ -1,3 +1,4 @@
+#To be removed / obsolete
 import os
 import sys
 sys.pycache_prefix = "/tmp/zemnir_pycache"

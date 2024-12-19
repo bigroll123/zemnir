@@ -3,7 +3,7 @@ import os
 def get_directory_structure_and_content(directory_path, exclude_items=None):
     """Traverse a directory and extract its structure and file contents."""
     if exclude_items is None:
-        exclude_items = [".gitignore", ".vscode", ".git", "changes", "README.md", "LICENSE"]  # Default exclusions
+        exclude_items = [".gitignore", ".vscode", ".git", "changes", "README.md", "LICENSE", "temp", "terminal_output.txt", "prompt.txt"]  # Default exclusions
         
     result = {"structure": {}, "files": {}}
     
