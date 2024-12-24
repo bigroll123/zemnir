@@ -64,3 +64,19 @@ def clear_prompt():
     with open(PROMPT_FILE, "w") as f:
         f.write('')
     return jsonify({"message": "Prompt cleared successfully."}), 200
+
+@app_routes.route("/get_models", methods=["GET"])
+def get_models():
+    try:
+        # Use OpenAI API to fetch available models
+        import openai
+        openai.api_key = Config.OPENAI_API_KEY
+
+        # Replace with an appropriate endpoint call if available
+        models_response = openai.Model.list()  # This is a placeholder, adjust as per actual API
+        models = [model['id'] for model in models_response['data']]
+
+        return jsonify(models), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+

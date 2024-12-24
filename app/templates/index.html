@@ -14,6 +14,7 @@
 </head>
 
 <body>
+    <script src="{{ url_for('static', filename='js/refresh.js') }}"></script>
 
    <!--  <h1>Zemnir Prompt</h1> -->
     <div class="prompt-container" id="prompt-div">
@@ -24,7 +25,6 @@
         <div class="textarea-container">
             <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..."
                 class="form-control"></textarea>
-            <button type="button" class="btn btn-primary" onclick="recordVoice()">Record Voice</button>
         </div>
 
         <input type="text" id="directory-path" name="directory_path"
@@ -37,17 +37,11 @@
         <div class="controls">
             <div class="dropdown">
                 <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-expanded="false">
                     {{ model if model else 'Select Model' }}
                 </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4o-mini')">gpt-4o-mini</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('gpt-3.5-turbo')">gpt-3.5-turbo</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4')">gpt-4</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4o')">gpt-4o</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('gpt-4-turbo')">gpt-4-turbo</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('o1-mini')">o1-mini</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModel('tts-1')">tts-1</a></li>
+                <ul class="dropdown-menu" id="modelDropdown" aria-labelledby="dropdownMenuButton">
+                    <!-- The contents will be populated dynamically using JavaScript -->
                 </ul>
             </div>
             <input type="hidden" id="model" name="model" value="{{ model }}">
@@ -76,14 +70,14 @@
                     {{ system_role if system_role else 'Select Role' }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="systemRoleDropdownButton">
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Expert No Execution')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Expert No Execution'] }}">Expert No Execution</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('System Administrator')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['System Administrator'] }}">System Administrator</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('DevOps Engineer')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['DevOps Engineer'] }}">DevOps Engineer</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Software Developer')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Software Developer'] }}">Software Developer</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setSystemRole('Support Analyst')" data-bs-toggle="tooltip" data-bs-title="{{ role_definitions['Support Analyst'] }}">Support Analyst</a></li>
+                    {% for role, description in role_definitions.items() %}
+                        <li><a class="dropdown-item" href="#" onclick="setSystemRole('{{ role }}')" data-bs-toggle="tooltip" data-bs-title="{{ description }}">{{ role }}</a></li>
+                    {% endfor %}
                 </ul>
                 <input type="hidden" id="system-role" name="system_role" value="{{ system_role }}">
             </div>
+            <button type="button" class="btn btn-primary" onclick="recordVoice()">Speech To Text</button>
+
         </div>
     </form>
    <!-- <h3>Terminal Output</h3> -->
