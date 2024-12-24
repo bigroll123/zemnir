@@ -24,7 +24,9 @@
         <div class="textarea-container">
             <textarea id="prompt-textarea" name="new_text" placeholder="Add text to prompt..."
                 class="form-control"></textarea>
+            <button type="button" class="btn btn-primary" onclick="recordVoice()">Record Voice</button>
         </div>
+
         <input type="text" id="directory-path" name="directory_path"
             placeholder="Enter directory path for debugging (optional)" class="form-control"
             style="width: 30%; margin-top: 10px;">
@@ -89,6 +91,29 @@
     <div class="terminal-output">{{ terminal_output }}</div>
 
     <script>
+        function recordVoice() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Upgrade your browser to use speech recognition.");
+            } else {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                
+                recognition.onresult = function (event) {
+                    const voiceText = event.results[0][0].transcript;
+                    document.getElementById('prompt-textarea').value = voiceText;
+                    console.log('Result: ' + voiceText);
+                };
+        
+                recognition.onend = function() {
+                    // Automatically click the submit button after voice input finishes
+                    document.querySelector('form .btn-success').click();
+                };
+        
+                recognition.start();
+            }
+        }
         function setModel(selectedModel) {
             document.getElementById('model').value = selectedModel; // Set the hidden input value
             var dropdownButton = document.getElementById('dropdownMenuButton');
@@ -136,7 +161,7 @@
             
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
         function clearPrompt() {
