@@ -68,14 +68,13 @@ def clear_prompt():
 @app_routes.route("/get_models", methods=["GET"])
 def get_models():
     try:
-        # Use OpenAI API to fetch available models
         import openai
-        openai.api_key = Config.OPENAI_API_KEY
+        # ensure API key is set from config/env
+        if not openai.api_key:
+            openai.api_key = Config.OPENAI_API_KEY
 
-        # Replace with an appropriate endpoint call if available
-        models_response = openai.Model.list()  # This is a placeholder, adjust as per actual API
-        models = [model['id'] for model in models_response['data']]
-
+        models_response = openai.Model.list()
+        models = [m["id"] for m in models_response.get("data", [])]
         return jsonify(models), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

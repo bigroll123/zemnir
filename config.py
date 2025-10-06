@@ -9,8 +9,8 @@ system_role_definitions = {
 }
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "your_openai_api_key")
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
     PROMPT_FILE = "../prompt.txt"
     TERMINAL_OUTPUT_FILE = "../terminal_output.txt"
-    CERT_FILE="../cert.pem"
-    KEY_FILE="../key.pem"
+    CERT_FILE = os.environ.get("CERT_FILE", "../cert.pem")
+    KEY_FILE = os.environ.get("KEY_FILE", "../key.pem")
